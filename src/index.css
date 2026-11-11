@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', 'Segoe UI', Roboto, sans-serif;
+  --color-munify-blue: #1E5BF8;
+  --color-munify-blue-hover: #194fd6;
+  --color-munify-green: #16A34A;
+  --color-munify-red: #DC2626;
+  --color-munify-bg: #F4F5F8;
+  --color-munify-card: #FFFFFF;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #EEF0F3;
+  color: #111827;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* App container centering for desktop / tablet previews */
+#root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  background-color: #EEF0F3;
+}
+
+.app-screen {
+  width: 100%;
+  max-width: 440px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #F4F5F8;
+  color: #111827;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.06);
+}
+
+/* Top Pale Cyan/Ice Gradient Header */
+.header-ice-gradient {
+  background: linear-gradient(180deg, #E6F6FB 0%, #EDF8FC 45%, #F7FAFC 80%, #FFFFFF 100%);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth spring active effect */
+.btn-press {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
+}
+.btn-press:active {
+  transform: scale(0.96);
+  opacity: 0.88;
+}
