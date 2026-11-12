@@ -38,15 +38,46 @@ export default function TransactionDetails() {
     );
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [purpose, setPurpose] = useState("Family Support (Ajutor Familiar)");
-  const [relationship, setRelationship] = useState("Immediate Family Member (Spouse, Child, Parent, Sibling)");
+  const [purpose, setPurpose] = useState(
+    transaction.verificationData?.purpose || "Family Support (Ajutor Familiar)"
+  );
+  const [relationship, setRelationship] = useState(
+    transaction.verificationData?.relationship ||
+      "Immediate Family Member (Spouse, Child, Parent, Sibling)"
+  );
   const [notes, setNotes] = useState("");
-  const [documents, setDocuments] = useState({
-    invoice: null,
-    contract: null,
-    agreement: null,
-    receipt: null
-  });
+  const [documents, setDocuments] = useState(
+    transaction.verificationData?.documents || {
+      invoice: null,
+      contract: null,
+      agreement: null,
+      receipt: null
+    }
+  );
+
+  useEffect(() => {
+    setIsSubmitted(
+      Boolean(
+        transaction.verificationSubmitted ||
+          localStorage.getItem(`munify_verify_${transaction.id}`) === "true"
+      )
+    );
+    setPurpose(
+      transaction.verificationData?.purpose || "Family Support (Ajutor Familiar)"
+    );
+    setRelationship(
+      transaction.verificationData?.relationship ||
+        "Immediate Family Member (Spouse, Child, Parent, Sibling)"
+    );
+    setDocuments(
+      transaction.verificationData?.documents || {
+        invoice: null,
+        contract: null,
+        agreement: null,
+        receipt: null
+      }
+    );
+  }, [transaction]);
 
   useEffect(() => {
     // If navigated with hash #compliance-form-section, auto-scroll
@@ -200,28 +231,53 @@ export default function TransactionDetails() {
 
         {/* SUBMITTED CONFIRMATION BANNER */}
         {requiresInfo && isSubmitted && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-4 shadow-xs animate-in fade-in">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-full bg-emerald-100 text-[#16A34A] flex items-center justify-center flex-shrink-0 text-base font-bold shadow-xs">
-                ✓
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-[13px] font-bold text-emerald-950">
-                    Documents Submitted — Under Fast-Track Review
-                  </h3>
-                  <span className="text-[10px] font-black uppercase bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded">
-                    Under Review
+          <div className="space-y-3 mb-4 animate-in fade-in">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 shadow-xs">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-emerald-100 text-[#16A34A] flex items-center justify-center flex-shrink-0 text-base font-bold shadow-xs">
+                  ✓
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-[13px] font-bold text-emerald-950">
+                      Documentation Submitted — Verification Processing
+                    </h3>
+                    <span className="text-[10px] font-black uppercase bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded">
+                      In Review
+                    </span>
+                  </div>
+                  <p className="text-[12px] text-emerald-900/90 mt-1 leading-snug">
+                    Supporting documentation has been received and logged by our AML & Compliance Operations desk. Verification is currently being processed.
+                  </p>
+                  <span className="inline-block text-[11px] font-mono text-emerald-800 font-semibold mt-1.5">
+                    Reference: #DOC-VERIFY-{transaction.transactionId?.replace("TR-", "") || transaction.id?.toUpperCase()}-EU
                   </span>
                 </div>
-                <p className="text-[12px] text-emerald-900/90 mt-1 leading-snug">
-                  Your information and documentation have been received by the compliance desk. Clearance review is in progress (est. 15–30 minutes).
-                </p>
-                <span className="inline-block text-[11px] font-mono text-emerald-800 font-semibold mt-1.5">
-                  Reference: #DOC-VERIFY-{transaction.transactionId?.replace("TR-", "") || transaction.id?.toUpperCase()}-EU
-                </span>
               </div>
             </div>
+
+            {transaction.refundInitiated && (
+              <div className="bg-blue-50/90 border border-blue-200 rounded-2xl p-4 shadow-xs">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-blue-100 text-[#1E5BF8] flex items-center justify-center flex-shrink-0 text-base font-bold shadow-xs">
+                    ↩
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-[13px] font-bold text-blue-950">
+                        Return of Funds (Refund) Initiated
+                      </h3>
+                      <span className="text-[10px] font-black uppercase bg-blue-200/80 text-[#1E5BF8] px-1.5 py-0.2 rounded">
+                        60–90 Days Settlement
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-blue-900/90 mt-1 leading-snug">
+                      A return of funds to the originating remitter&apos;s account has been initiated in accordance with SEPA interbank clearing and regulatory settlement procedures. Please allow <strong>60 to 90 calendar days</strong> from the initiation date for final reconciliation and credit to the sender&apos;s account.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -328,7 +384,7 @@ export default function TransactionDetails() {
                 <span>●</span>
                 <span>
                   {isSubmitted
-                    ? "Under Compliance Review"
+                    ? "Documents Submitted • Verification Processing"
                     : isPending
                     ? "Pending Verification"
                     : "Completed"}
@@ -583,27 +639,64 @@ export default function TransactionDetails() {
                           ✓
                         </span>
                         <span className="text-[13px] font-bold text-emerald-950">
-                          Documents Received & Queued for Fast-Track Review
+                          Documentation Submitted — Verification Processing
                         </span>
                       </div>
                       <p className="text-xs text-emerald-900 leading-relaxed">
-                        Your transaction purpose and {Object.values(documents).filter(Boolean).length || 3} supporting documents have been submitted to compliance. Funds will be released once review is complete.
+                        Your transaction purpose and {Object.values(documents).filter(Boolean).length || 4} supporting compliance documents have been received and are being processed by AML &amp; Settlement Operations.
                       </p>
                     </div>
 
+                    {/* Submitted Document Files Summary */}
+                    {Object.values(documents).some(Boolean) && (
+                      <div className="space-y-1.5">
+                        {Object.entries(documents).map(([key, doc]) =>
+                          doc ? (
+                            <div
+                              key={key}
+                              className="flex items-center justify-between bg-gray-50 border border-gray-200/80 rounded-xl px-3 py-2 text-xs"
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="w-5 h-5 rounded-full bg-emerald-100 text-[#16A34A] flex items-center justify-center text-[11px] font-bold flex-shrink-0">
+                                  ✓
+                                </span>
+                                <span className="font-semibold text-gray-800 capitalize flex-shrink-0">
+                                  {key}:
+                                </span>
+                                <span className="text-gray-500 truncate">
+                                  {doc.name}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full flex-shrink-0 ml-2">
+                                Submitted
+                              </span>
+                            </div>
+                          ) : null
+                        )}
+                      </div>
+                    )}
+
                     <div className="bg-gray-50 rounded-xl p-3.5 space-y-2 text-xs border border-gray-100">
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Purpose:</span>
-                        <span className="font-semibold text-gray-900">{purpose}</span>
+                      <div className="flex justify-between gap-3">
+                        <span className="text-gray-500 flex-shrink-0">Purpose:</span>
+                        <span className="font-semibold text-gray-900 text-right">{purpose}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Relationship:</span>
-                        <span className="font-semibold text-gray-900">{relationship}</span>
+                      <div className="flex justify-between gap-3">
+                        <span className="text-gray-500 flex-shrink-0">Relationship:</span>
+                        <span className="font-semibold text-gray-900 text-right">{relationship}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Review Status:</span>
-                        <span className="font-semibold text-amber-600">Pending Clearance</span>
+                      <div className="flex justify-between gap-3">
+                        <span className="text-gray-500 flex-shrink-0">Verification Status:</span>
+                        <span className="font-semibold text-amber-600">Verification Processing</span>
                       </div>
+                      {transaction.refundInitiated && (
+                        <div className="flex justify-between gap-3 pt-1.5 border-t border-gray-200/70">
+                          <span className="text-gray-500 flex-shrink-0">Return Settlement Window:</span>
+                          <span className="font-bold text-[#1E5BF8] text-right">
+                            60–90 Calendar Days (To Originating Account)
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     <button
@@ -611,7 +704,7 @@ export default function TransactionDetails() {
                       onClick={() => setIsSubmitted(false)}
                       className="w-full py-2 text-center text-xs font-bold text-[#1E5BF8] hover:underline transition"
                     >
-                      Edit or Upload Additional Documents
+                      View or Append Additional Documents
                     </button>
                   </div>
                 )}

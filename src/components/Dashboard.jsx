@@ -66,15 +66,15 @@ export default function Dashboard() {
   const todayTransactions = transactions.filter(
     (t) => t.date === "Today" || t.date === "11 November 2026"
   );
-  const yesterdayTransactions = transactions.filter(
-    (t) => t.date === "Yesterday" || t.date === "10 November 2026"
+  const nov09Transactions = transactions.filter(
+    (t) => t.date === "November 09" || t.date === "9 November 2026"
   );
   const earlierTransactions = transactions.filter(
     (t) =>
       t.date !== "Today" &&
-      t.date !== "Yesterday" &&
+      t.date !== "November 09" &&
       t.date !== "11 November 2026" &&
-      t.date !== "10 November 2026"
+      t.date !== "9 November 2026"
   );
 
   // Currency carousel items matching screenshot: SEK 0 on left, €0.50 in center, £0 on right
@@ -356,14 +356,14 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* GROUP 2: YESTERDAY (LADISLAV, PALL, ALVARO, DANISH, ALVARO) */}
-        {yesterdayTransactions.length > 0 && (
+        {/* GROUP 2: NOVEMBER 09 (LADISLAV, PALL, ALVARO, DANISH, ALVARO) */}
+        {nov09Transactions.length > 0 && (
           <div>
             <h2 className="text-[13px] font-bold text-gray-600 mb-2 px-1 tracking-tight">
-              Yesterday
+              November 09
             </h2>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100 overflow-hidden">
-              {yesterdayTransactions.map((tx) => {
+              {nov09Transactions.map((tx) => {
                 const isPending = tx.status === "Pending" || tx.isPending;
                 const isPositive =
                   tx.direction === "in" ||

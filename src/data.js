@@ -71,30 +71,54 @@ export const transactions = [
   ...initialData.transactions
 ];
 
-// Transaction-specific notifications catalog (1 notification per transaction)
+// Transaction-specific notifications catalog (1+ notification per transaction)
 export const notificationsData = [
+  {
+    id: "notif_refund_yesterday_ladislav",
+    transactionId: "tx_yesterday_ladislav",
+    title: "Return of Funds (Refund) Initiated",
+    body: "Following compliance verification of incoming SEPA transfer TR-420918-LS (+€420.00 from LADISLAV SUNKOVSKY), a return of funds to the originating remitter account has been initiated. In accordance with interbank clearing and regulatory settlement procedures, please allow 60 to 90 calendar days from the initiation date for the refund to reflect in the sender's account.",
+    time: "Today, 09:42",
+    unread: true,
+    actionRequired: false,
+    type: "refund",
+    badge: "60–90 Days Settlement",
+    amount: "+€420"
+  },
+  {
+    id: "notif_refund_yesterday_pall",
+    transactionId: "tx_yesterday_pall",
+    title: "Return of Funds (Refund) Initiated",
+    body: "Following compliance verification of incoming SEPA transfer TR-850124-PH (+€850.00 from PALL HEIMIR PALSSON), a return of funds to the originating remitter account has been initiated. In accordance with interbank clearing and regulatory settlement procedures, please allow 60 to 90 calendar days from the initiation date for the refund to reflect in the sender's account.",
+    time: "Today, 09:40",
+    unread: true,
+    actionRequired: false,
+    type: "refund",
+    badge: "60–90 Days Settlement",
+    amount: "+€850"
+  },
   {
     id: "notif_tx_yesterday_ladislav",
     transactionId: "tx_yesterday_ladislav",
-    title: "Action Required: Information Requested",
-    body: "Action required for +€420 from LADISLAV SUNKOVSKY. Please submit the purpose of transaction and supporting documents (Invoice, Contract, Agreement, Receipt) to release funds.",
-    time: "Yesterday, 13:45",
-    unread: true,
-    actionRequired: true,
-    type: "action_required",
-    badge: "Action Needed",
+    title: "Documentation Submitted — Verification Processing",
+    body: "Supporting compliance documentation for incoming transfer TR-420918-LS (+€420.00 from LADISLAV SUNKOVSKY) has been received and logged. AML & Compliance verification is currently being processed.",
+    time: "November 09, 14:12",
+    unread: false,
+    actionRequired: false,
+    type: "verification",
+    badge: "Verification Processing",
     amount: "+€420"
   },
   {
     id: "notif_tx_yesterday_pall",
     transactionId: "tx_yesterday_pall",
-    title: "Action Required: Information Requested",
-    body: "Action required for +€850 from PALL HEIMIR PALSSON. Please submit the purpose of transaction and supporting documents (Invoice, Contract, Agreement, Receipt) to release funds.",
-    time: "Yesterday, 13:20",
-    unread: true,
-    actionRequired: true,
-    type: "action_required",
-    badge: "Action Needed",
+    title: "Documentation Submitted — Verification Processing",
+    body: "Supporting compliance documentation for incoming transfer TR-850124-PH (+€850.00 from PALL HEIMIR PALSSON) has been received and logged. AML & Compliance verification is currently being processed.",
+    time: "November 09, 13:50",
+    unread: false,
+    actionRequired: false,
+    type: "verification",
+    badge: "Verification Processing",
     amount: "+€850"
   },
   {
@@ -102,7 +126,7 @@ export const notificationsData = [
     transactionId: "tx_yesterday_alvaro_1",
     title: "Payment Sent",
     body: "You sent a payment of -€30.00 to Alvaro Padilla Llamas.",
-    time: "Yesterday, 11:15",
+    time: "November 09, 11:15",
     unread: false,
     actionRequired: false,
     type: "payment",
@@ -113,7 +137,7 @@ export const notificationsData = [
     transactionId: "tx_yesterday_danish",
     title: "Transfer Received",
     body: "Incoming transfer of +€30.00 from DANISH SHAIKH via SEPA Instant was credited.",
-    time: "Yesterday, 10:45",
+    time: "November 09, 10:45",
     unread: false,
     actionRequired: false,
     type: "deposit",
@@ -124,7 +148,7 @@ export const notificationsData = [
     transactionId: "tx_yesterday_alvaro_2",
     title: "Payment Sent",
     body: "You sent a payment of -€420.00 to Alvaro Padilla Llamas.",
-    time: "Yesterday, 09:05",
+    time: "November 09, 09:05",
     unread: false,
     actionRequired: false,
     type: "payment",
@@ -425,18 +449,19 @@ export function submitTransactionVerification(txId, verificationPayload) {
   if (tx) {
     tx.verificationSubmitted = true;
     tx.verificationData = verificationPayload;
-    tx.status = "Under Review";
-    tx.subtitle = "Under Review •";
-    tx.note = `${verificationPayload.purpose || "Compliance verification"} - Documents Submitted`;
+    tx.status = "Verification Processing";
+    tx.subtitle = "Docs Submitted • Processing";
+    tx.note = `${verificationPayload.purpose || "Compliance verification"} - Documentation Submitted`;
   }
 
   // Update notification
-  const notif = notificationsData.find((n) => n.transactionId === txId);
+  const notif = notificationsData.find((n) => n.transactionId === txId && n.type !== "refund");
   if (notif) {
-    notif.title = "Documents Received";
-    notif.body = `Information and documents for ${tx ? tx.displayAmount : "funds"} from ${tx ? tx.counterparty : "sender"} received. Expedited review in progress.`;
+    notif.title = "Documentation Submitted — Verification Processing";
+    notif.body = `Supporting compliance documentation for ${tx ? tx.displayAmount : "funds"} from ${tx ? tx.counterparty : "sender"} has been received and logged. AML & Compliance verification is currently being processed.`;
     notif.actionRequired = false;
-    notif.badge = "Under Review";
+    notif.type = "verification";
+    notif.badge = "Verification Processing";
   }
 
   window.dispatchEvent(new CustomEvent("munify_transaction_updated"));

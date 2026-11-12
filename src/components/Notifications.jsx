@@ -41,7 +41,15 @@ export default function Notifications({ onClose }) {
 
   const filteredNotifications = notifications.filter((n) => {
     if (filter === "action") return n.actionRequired || n.type === "action_required";
-    if (filter === "transfers") return n.type === "deposit" || n.type === "payment" || n.type === "withdrawal";
+    if (filter === "transfers") {
+      return (
+        n.type === "deposit" ||
+        n.type === "payment" ||
+        n.type === "withdrawal" ||
+        n.type === "refund" ||
+        n.type === "verification"
+      );
+    }
     return true;
   });
 
@@ -144,6 +152,10 @@ export default function Notifications({ onClose }) {
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
                       isAction
                         ? "bg-amber-100 text-amber-800"
+                        : n.type === "refund"
+                        ? "bg-blue-50 text-[#1E5BF8]"
+                        : n.type === "verification"
+                        ? "bg-emerald-50 text-[#16A34A]"
                         : n.type === "deposit"
                         ? "bg-emerald-50 text-[#16A34A]"
                         : n.type === "payment"
@@ -153,7 +165,19 @@ export default function Notifications({ onClose }) {
                         : "bg-blue-50 text-[#1E5BF8]"
                     }`}
                   >
-                    {isAction ? "⚠️" : n.type === "deposit" ? "↓" : n.type === "payment" ? "↑" : n.type === "card" ? "💳" : "🔔"}
+                    {isAction
+                      ? "⚠️"
+                      : n.type === "refund"
+                      ? "↩"
+                      : n.type === "verification"
+                      ? "✓"
+                      : n.type === "deposit"
+                      ? "↓"
+                      : n.type === "payment"
+                      ? "↑"
+                      : n.type === "card"
+                      ? "💳"
+                      : "🔔"}
                   </div>
                   {n.unread && (
                     <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-[#1E5BF8] rounded-full border-2 border-white" />
@@ -170,6 +194,17 @@ export default function Notifications({ onClose }) {
                       {isAction && (
                         <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-amber-200 text-amber-900">
                           Action Needed
+                        </span>
+                      )}
+                      {!isAction && n.badge && (
+                        <span
+                          className={`text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded ${
+                            n.type === "refund"
+                              ? "bg-blue-100 text-[#1E5BF8]"
+                              : "bg-emerald-100 text-emerald-800"
+                          }`}
+                        >
+                          {n.badge}
                         </span>
                       )}
                     </div>
