@@ -247,10 +247,10 @@ export default function TransactionDetails() {
                     </span>
                   </div>
                   <p className="text-[12px] text-emerald-900/90 mt-1 leading-snug">
-                    Supporting documentation has been received and logged by our AML & Compliance Operations desk. Verification is currently being processed.
+                    Supporting documentation was submitted on <strong>{transaction.submittedDate || "11 November 2026"}</strong> and logged by our AML &amp; Compliance Operations desk. Verification is currently being processed.
                   </p>
                   <span className="inline-block text-[11px] font-mono text-emerald-800 font-semibold mt-1.5">
-                    Reference: #DOC-VERIFY-{transaction.transactionId?.replace("TR-", "") || transaction.id?.toUpperCase()}-EU
+                    Submitted: {transaction.submittedDate || "11 Nov 2026"} • Ref: #DOC-VERIFY-{transaction.transactionId?.replace("TR-", "") || transaction.id?.toUpperCase()}-EU
                   </span>
                 </div>
               </div>
@@ -686,16 +686,30 @@ export default function TransactionDetails() {
                         <span className="font-semibold text-gray-900 text-right">{relationship}</span>
                       </div>
                       <div className="flex justify-between gap-3">
+                        <span className="text-gray-500 flex-shrink-0">Submitted On:</span>
+                        <span className="font-semibold text-gray-900">
+                          {transaction.submittedDate || "11 November 2026"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-3">
                         <span className="text-gray-500 flex-shrink-0">Verification Status:</span>
                         <span className="font-semibold text-amber-600">Verification Processing</span>
                       </div>
                       {transaction.refundInitiated && (
-                        <div className="flex justify-between gap-3 pt-1.5 border-t border-gray-200/70">
-                          <span className="text-gray-500 flex-shrink-0">Return Settlement Window:</span>
-                          <span className="font-bold text-[#1E5BF8] text-right">
-                            60–90 Calendar Days (To Originating Account)
-                          </span>
-                        </div>
+                        <>
+                          <div className="flex justify-between gap-3 pt-1.5 border-t border-gray-200/70">
+                            <span className="text-gray-500 flex-shrink-0">Refund Notice Issued:</span>
+                            <span className="font-semibold text-gray-900 text-right">
+                              Today ({transaction.refundNoticeDate || "12 November 2026"})
+                            </span>
+                          </div>
+                          <div className="flex justify-between gap-3">
+                            <span className="text-gray-500 flex-shrink-0">Return Settlement Window:</span>
+                            <span className="font-bold text-[#1E5BF8] text-right">
+                              60–90 Calendar Days (To Originating Account)
+                            </span>
+                          </div>
+                        </>
                       )}
                     </div>
 
